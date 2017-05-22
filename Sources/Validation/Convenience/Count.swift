@@ -26,7 +26,7 @@ public enum Count<Input: Countable>: Validator {
     ///
     /// - parameter value: input string to validate
     ///
-    ///     - throws: an error if validation fails
+    /// - throws: an error if validation fails
     public func validate(_ input: Input) throws {
         let count = input.count
         switch self {

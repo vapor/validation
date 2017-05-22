@@ -18,7 +18,6 @@ class Name: Validator {
     }
 }
 
-
 class ValidationTests: XCTestCase {
     static let allTests = [
         ("testName", testName),
