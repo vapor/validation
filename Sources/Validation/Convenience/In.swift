@@ -1,10 +1,5 @@
 /// Validate that is in given collection
-public struct In<
-    T>: Validator where
-    T: Validatable,
-    T: Equatable
-{
-
+public struct In<T>: Validator where T: Validatable, T: Equatable {
     private let collection: [T]
 
     /// Create in validation against passed iterator
