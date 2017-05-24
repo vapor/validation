@@ -2,7 +2,7 @@
     <img src="https://cloud.githubusercontent.com/assets/1977704/25427066/9f87e6a4-2a71-11e7-8f51-30bb76181abc.png" width="320" alt="Validation">
     <br>
     <br>
-    <a href="https://docs.vapor.codes/2.0/validation/package/">
+    <a href="https://docs.vapor.codes/2.0/validation/overview/">
         <img src="http://img.shields.io/badge/read_the-docs-92A8D1.svg" alt="Documentation">
     </a>
     <a href="http://vapor.team">
