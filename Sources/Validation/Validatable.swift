@@ -1,4 +1,5 @@
-/// This is an API driven protocol 
+import Foundation
+/// This is an API driven protocol
 /// and any type that might need to be validated
 /// can be conformed independently
 public protocol Validatable {}
@@ -59,3 +60,4 @@ extension UInt64: Validatable {}
 
 extension Float: Validatable {}
 extension Double: Validatable {}
+extension Date: Validatable {}
