@@ -24,6 +24,15 @@ class ValidationTests: XCTestCase {
         ("testPassword", testPassword),
         ("testNot", testNot),
         ("testComposition", testComposition),
+        ("testDetailedFailure", testDetailedFailure),
+        ("testValidEmail", testValidEmail),
+        ("testValidHexadecimal", testValidHexadecimal),
+        ("testValidMacAddress", testValidMacAddress),
+        ("testValidUUID", testValidUUID),
+        ("testValidMongoID", testValidMongoID),
+        ("testValidMD5", testValidMD5),
+        ("testValidBase64", testValidBase64),
+        ("testValidASCII", testValidASCII)
     ]
 
     func testName() throws {
