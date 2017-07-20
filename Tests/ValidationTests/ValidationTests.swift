@@ -75,15 +75,16 @@ class ValidationTests: XCTestCase {
     }
 
     func testValidEmail() {
-        // Thanks again Ben Wu :)
         XCTAssertFalse("".passes(EmailValidator()))
         XCTAssertFalse("@".passes(EmailValidator()))
         XCTAssertFalse("@.".passes(EmailValidator()))
         XCTAssertFalse("@.com".passes(EmailValidator()))
         XCTAssertFalse("foo@.com".passes(EmailValidator()))
         XCTAssertFalse("@foo.com".passes(EmailValidator()))
-        XCTAssertTrue("f@b.c".passes(EmailValidator()))
+        XCTAssertTrue("f@b.co".passes(EmailValidator()))
         XCTAssertTrue("foo@bar.com".passes(EmailValidator()))
+        XCTAssertTrue("ehfe!#$%&'*+/=?^_`{|}~@gmail.com".passes(EmailValidator()))
+        XCTAssertTrue("foo!-bar!-baz@foo.bar".passes(EmailValidator()))
         XCTAssertFalse("f@b.".passes(EmailValidator()))
         XCTAssertFalse("æøå@gmail.com".passes(EmailValidator()))
     }
