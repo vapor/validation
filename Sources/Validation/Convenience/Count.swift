@@ -90,11 +90,19 @@ extension String: Countable {
     }
 }
 
+#if swift(>=4)
+extension BinaryInteger {
+    public var count: Self {
+        return self
+    }
+}
+#else
 extension Integer {
     public var count: Self {
         return self
     }
 }
+#endif
 
 extension FloatingPoint {
     public var count: Self {

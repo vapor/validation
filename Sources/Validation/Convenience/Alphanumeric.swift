@@ -14,13 +14,12 @@ public struct OnlyAlphanumeric: Validator {
         - throws: an error if validation fails
     */
     public func validate(_ input: String) throws {
-        let passed = input
+        let passed = !input
             .lowercased()
             .characters
-            .filter(validCharacters.contains)
-            .count
+            .contains { !validCharacters.contains($0) }
 
-        if passed != input.characters.count {
+        if !passed {
             throw error("\(input) is not alphanumeric")
         }
     }

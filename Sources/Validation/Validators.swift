@@ -11,7 +11,7 @@ extension Validator {
     /// On validation failure, use this to indicate
     /// why validation failed
     public func error(_ reason: String) -> Error {
-        let type = String(describing: type(of: self))
+        let type = String(describing: Swift.type(of: self))
         return ValidatorError.failure(type: type, reason: reason)
     }
 }
