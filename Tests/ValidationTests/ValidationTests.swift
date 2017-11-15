@@ -83,7 +83,7 @@ class ValidationTests: XCTestCase {
         XCTAssertFalse("@foo.com".passes(EmailValidator()))
         XCTAssertTrue("f@b.co".passes(EmailValidator()))
         XCTAssertTrue("foo@bar.com".passes(EmailValidator()))
-        XCTAssertTrue("ehfe!#$%&'*+/=?^_`{|}~@gmail.com".passes(EmailValidator()))
+        XCTAssertTrue("SOMETHING@SOMETHING.SOMETHING".passes(EmailValidator()))
         XCTAssertTrue("foo!-bar!-baz@foo.bar".passes(EmailValidator()))
         XCTAssertFalse("f@b.".passes(EmailValidator()))
         XCTAssertFalse("æøå@gmail.com".passes(EmailValidator()))

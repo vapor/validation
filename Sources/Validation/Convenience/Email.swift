@@ -3,10 +3,7 @@ import Foundation
 public struct EmailValidator: Validator {
 
     public init() {}
-	
-	private static let name = "[a-z0-9!#$%&'*+/=?^_`{|}~]"
-	private static let server = "[a-z0-9\\.-]"
-	private let pattern = "^\(name)+([\\.-]?\(name)+)*@\(server)+([\\.-]?\(server)+)*(\\.\\w{2,3})+$"
+	private let pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
 
 
     public func validate(_ input: String) throws {
