@@ -1,61 +1,66 @@
-/// This is an API driven protocol 
-/// and any type that might need to be validated
-/// can be conformed independently
-public protocol Validatable {}
+/// Capable of being validated.
+public protocol Validatable: Codable, ValidationDataRepresentable {
+    /// The validations that will run when `.validate()`
+    /// is called on an instance of this class.
+    static var validations: Validations { get }
+}
 
 extension Validatable {
-    /// Validate an individual validator
-    public func validated<V: Validator>(by validator: V) throws where V.Input == Self {
-        let list = ValidatorList(validator)
-        try validated(by: list)
-    }
-
-    /// Push validation to list level for more consistent error lists
-    public func validated(by list: ValidatorList<Self>) throws {
-        try list.validate(self)
+    /// See ValidationDataRepresentable.makeValidationData()
+    public func makeValidationData() -> ValidationData {
+        return .validatable(self)
     }
 }
 
 extension Validatable {
-    /// Tests a value with a given validator, upon passing, returns self
-    /// or throws
-    public func tested<V: Validator>(by v: V) throws -> Self where V.Input == Self {
-        try v.validate(self)
-        return self
-    }
+    /// Validates the model, throwing an error
+    /// if any of the validations fail.
+    /// note: non-validation errors may also be thrown
+    /// should the validators encounter unexpected errors.
+    public func validate() throws {
+        var errors: [ValidationError] = []
 
-    /// Converts validation to a boolean indicating success/failure
-    public func passes<V: Validator>(_ v: V) -> Bool where V.Input == Self {
-        do {
-            try validated(by: v)
-            return true
-        } catch {
-            return false
+        for (key, validation) in Self.validations.storage {
+            /// fetch the value for the key path and
+            /// convert it to validation data
+            let data = (self[keyPath: key.keyPath] as ValidationDataRepresentable).makeValidationData()
+
+            /// run the validation, catching validation errors
+            do {
+                try validation.validate(data)
+            } catch var error as ValidationError {
+                error.codingPath += key.codingPath
+                errors.append(error)
+            }
+        }
+
+        if !errors.isEmpty {
+            throw ValidatableError(errors)
         }
     }
 }
 
-// MARK: Conformance
+/// a collection of errors thrown by validatable
+/// models validations
+struct ValidatableError: ValidationError {
+    /// the errors thrown
+    var errors: [ValidationError]
 
-extension String: Validatable {}
+    /// See ValidationError.keyPath
+    var codingPath: [CodingKey]
 
-extension Set: Validatable {}
-extension Array: Validatable {}
-extension Dictionary: Validatable {}
+    /// See ValidationError.reason
+    var reason: String {
+        return errors.map { error in
+            var mutableError = error
+            mutableError.codingPath = codingPath + error.codingPath
+            return mutableError.reason
+        }.joined(separator: ", ")
+    }
 
-extension Bool: Validatable {}
-
-extension Int: Validatable {}
-extension Int8: Validatable {}
-extension Int16: Validatable {}
-extension Int32: Validatable {}
-extension Int64: Validatable {}
-
-extension UInt: Validatable {}
-extension UInt8: Validatable {}
-extension UInt16: Validatable {}
-extension UInt32: Validatable {}
-extension UInt64: Validatable {}
-
-extension Float: Validatable {}
-extension Double: Validatable {}
+    /// creates a new validatable error
+    public init(_ errors: [ValidationError]) {
+        self.errors = errors
+        self.codingPath = []
+    }
+}
