@@ -8,7 +8,7 @@ let package = Package(
     ],
     dependencies: [
         // Core extensions, type-aliases, and functions that facilitate common tasks.
-        .package(url: "https://github.com/vapor/core.git", .exact("3.0.0-beta.1")),
+        .package(url: "https://github.com/vapor/core.git", "3.0.0-beta.1"..<"3.0.0-beta.2"),
     ],
     targets: [
         // Validation
