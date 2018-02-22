@@ -28,7 +28,7 @@ public struct BasicValidationError: ValidationError {
 
 /// A validation error that supports dynamic
 /// key paths.
-public protocol ValidationError: Debuggable, Error {
+public protocol ValidationError: Debuggable {
     /// See Debuggable.reason
     var reason: String { get }
 
