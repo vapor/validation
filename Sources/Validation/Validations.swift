@@ -1,3 +1,5 @@
+import Core
+
 public struct Validations: ExpressibleByDictionaryLiteral {
     /// Store the key and query field.
     internal var storage: [ValidationKey: Validator]
@@ -28,7 +30,7 @@ public struct ValidationKey: Hashable {
     public var keyPath: AnyKeyPath
 
     /// The respective CodingKey path.
-    public var codingPath: [CodingKey]
+    public var path: [String]
 
     /// The properties type.
     /// Storing this as `Any` since we lost
@@ -40,20 +42,20 @@ public struct ValidationKey: Hashable {
     public var isOptional: Bool
 
     /// Create a new model key.
-    internal init<T>(keyPath: AnyKeyPath, codingPath: [CodingKey], type: T.Type, isOptional: Bool) {
+    internal init<T>(keyPath: AnyKeyPath, path: [String], type: T.Type, isOptional: Bool) {
         self.keyPath = keyPath
-        self.codingPath = codingPath
+        self.path = path
         self.type = type
         self.isOptional = isOptional
     }
 }
 
-extension Validatable {
+extension Validatable where Self: Reflectable {
     /// Create a validation key for the supplied key path.
     public static func key<T>(_ path: KeyPath<Self, T>) -> ValidationKey where T: ValidationDataRepresentable, T: KeyStringDecodable {
         return try! ValidationKey(
             keyPath: path,
-            codingPath: Self.codingPath(forKey: path),
+            path: Self.reflectProperty(forKey: path).path,
             type: T.self,
             isOptional: false
         )
@@ -63,7 +65,7 @@ extension Validatable {
     public static func key<T>(_ path: KeyPath<Self, T?>) -> ValidationKey where T: ValidationDataRepresentable, T: KeyStringDecodable {
         return try! ValidationKey(
             keyPath: path,
-            codingPath: Self.codingPath(forKey: path),
+            path: Self.reflectProperty(forKey: path).path,
             type: T.self,
             isOptional: true
         )
