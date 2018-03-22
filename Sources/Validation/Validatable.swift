@@ -1,3 +1,5 @@
+import Core
+
 /// Capable of being validated.
 public protocol Validatable: Codable, ValidationDataRepresentable {
     /// The validations that will run when `.validate()`
@@ -29,7 +31,7 @@ extension Validatable {
             do {
                 try validation.validate(data)
             } catch var error as ValidationError {
-                error.codingPath += key.codingPath
+                error.path += key.path
                 errors.append(error)
             }
         }
@@ -47,13 +49,13 @@ struct ValidatableError: ValidationError {
     var errors: [ValidationError]
 
     /// See ValidationError.keyPath
-    var codingPath: [CodingKey]
+    var path: [String]
 
     /// See ValidationError.reason
     var reason: String {
         return errors.map { error in
             var mutableError = error
-            mutableError.codingPath = codingPath + error.codingPath
+            mutableError.path = path + error.path
             return mutableError.reason
         }.joined(separator: ", ")
     }
@@ -61,6 +63,6 @@ struct ValidatableError: ValidationError {
     /// creates a new validatable error
     public init(_ errors: [ValidationError]) {
         self.errors = errors
-        self.codingPath = []
+        self.path = []
     }
 }

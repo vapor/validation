@@ -1,3 +1,4 @@
+import Core
 import Validation
 import XCTest
 
@@ -57,7 +58,7 @@ class ValidationTests: XCTestCase {
     ]
 }
 
-final class User: Validatable {
+final class User: Validatable, Reflectable {
     var id: Int?
     var name: String
     var age: Int
