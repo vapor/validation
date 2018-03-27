@@ -12,7 +12,7 @@ let package = Package(
     ],
     targets: [
         // Validation
-        .target(name: "Validation", dependencies: ["CodableKit"]),
+        .target(name: "Validation", dependencies: ["Core"]),
         .testTarget(name: "ValidationTests", dependencies: ["Validation"]),
     ]
 )

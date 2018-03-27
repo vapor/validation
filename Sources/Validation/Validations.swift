@@ -52,20 +52,20 @@ public struct ValidationKey: Hashable {
 
 extension Validatable where Self: Reflectable {
     /// Create a validation key for the supplied key path.
-    public static func key<T>(_ path: KeyPath<Self, T>) -> ValidationKey where T: ValidationDataRepresentable, T: KeyStringDecodable {
+    public static func key<T>(_ path: KeyPath<Self, T>) -> ValidationKey where T: ValidationDataRepresentable {
         return try! ValidationKey(
             keyPath: path,
-            path: Self.reflectProperty(forKey: path).path,
+            path: Self.reflectProperty(forKey: path)?.path ?? [],
             type: T.self,
             isOptional: false
         )
     }
 
     /// Create a validation key for the supplied key path.
-    public static func key<T>(_ path: KeyPath<Self, T?>) -> ValidationKey where T: ValidationDataRepresentable, T: KeyStringDecodable {
+    public static func key<T>(_ path: KeyPath<Self, T?>) -> ValidationKey where T: ValidationDataRepresentable {
         return try! ValidationKey(
             keyPath: path,
-            path: Self.reflectProperty(forKey: path).path,
+            path: Self.reflectProperty(forKey: path)?.path ?? [],
             type: T.self,
             isOptional: true
         )
