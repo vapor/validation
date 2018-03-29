@@ -14,7 +14,7 @@ public struct IsASCII: Validator {
     public func validate(_ data: ValidationData) throws {
         switch data {
         case .string(let s):
-            guard s.range(of: "^[ -~]+$", options: [.regularExpression, .caseInsensitive]) != nil else {
+            guard s.range(of: "^[\\x09-\\x0d -~]+$", options: [.regularExpression, .caseInsensitive]) != nil else {
                 throw BasicValidationError("is not ASCII")
             }
         default:

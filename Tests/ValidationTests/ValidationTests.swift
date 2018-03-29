@@ -9,7 +9,10 @@ class ValidationTests: XCTestCase {
     }
 
     func testASCII() throws {
-        try IsASCII().validate(.string("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))
+        try IsASCII().validate(.string("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
+        try IsASCII().validate(.string("\n\r\t"))
+        try IsASCII().validate(.string(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"))
+
         XCTAssertThrowsError(try IsASCII().validate(.string("ABCDEFGHIJKLMNOPQR🤠STUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))) {
             XCTAssert($0 is ValidationError)
         }
