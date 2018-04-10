@@ -1,6 +1,8 @@
 import Debugging
 
 /// A validation error that supports dynamic key paths.
+///
+/// See `BasicValidationError` for a default implementation.
 public protocol ValidationError: Debuggable {
     /// Key path to the invalid data.
     var path: [String] { get set }

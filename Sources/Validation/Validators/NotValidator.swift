@@ -2,29 +2,32 @@
 ///
 ///     try validations.add(\.email, .email && !.nil)
 ///
-public prefix func ! (rhs: Validation) -> Validation {
-    return NotValidator(rhs).validation()
+public prefix func !<T> (rhs: Validator<T>) -> Validator<T> {
+    return NotValidator(rhs).validator()
 }
 
 // MARK: Private
 
 /// Inverts a validator
-fileprivate struct NotValidator: Validator {
-    /// See `Validator`
+fileprivate struct NotValidator<T>: ValidatorType {
+    /// See `ValidatorType`.
+    typealias ValidationData = T
+
+    /// See `ValidatorType`
     public var validatorReadable: String {
         return "not \(rhs.readable)"
     }
 
-    /// The inverted `Validation`.
-    let rhs: Validation
+    /// The inverted `Validator`.
+    let rhs: Validator<T>
 
     /// Creates a new `NotValidator`.
-    init(_ rhs: Validation) {
+    init(_ rhs: Validator<T>) {
         self.rhs = rhs
     }
 
-    /// See `Validator`
-    func validate(_ data: ValidationData) throws {
+    /// See `ValidatorType`
+    func validate(_ data: T) throws {
         var error: ValidationError?
         do {
             try rhs.validate(data)

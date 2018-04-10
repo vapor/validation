@@ -1,4 +1,4 @@
-/// Capable of being validated.
+/// Capable of being validated. Conformance adds a throwing `validate()` method.
 ///
 ///     struct User: Validatable, Reflectable {
 ///         var name: String
@@ -8,8 +8,6 @@
 ///             var validations = Validations(User.self)
 ///             // validate name is at least 5 characters and alphanumeric
 ///             try validations.add(\.name, .count(5...) && .alphanumeric)
-///             // validate age is 18 or older
-///             try validations.add(\.age, .count(18...))
 ///             return validations
 ///         }
 ///     }
@@ -25,8 +23,6 @@ public protocol Validatable {
     ///             var validations = Validations(User.self)
     ///             // validate name is at least 5 characters and alphanumeric
     ///             try validations.add(\.name, .count(5...) && .alphanumeric)
-    ///             // validate age is 18 or older
-    ///             try validations.add(\.age, .count(18...))
     ///             return validations
     ///         }
     ///     }
@@ -44,17 +40,11 @@ extension Validatable {
     public func validate() throws {
         var errors: [ValidationError] = []
 
-        let validations = try Self.validations()
-        for (key, validation) in validations {
-            /// fetch the value for the key path and
-            /// convert it to validation data
-            let data = try key.get(from: self)
-
+        for validation in try Self.validations() {
             /// run the validation, catching validation errors
             do {
-                try validation.validate(data)
-            } catch var error as ValidationError {
-                error.path += key.path
+                try validation.validate(self)
+            } catch let error as ValidationError {
                 errors.append(error)
             }
         }

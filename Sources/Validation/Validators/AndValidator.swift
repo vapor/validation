@@ -1,34 +1,32 @@
 /// Combines two `Validation`s using AND logic, succeeding if both validations succeed without error.
 ///
-///     try validations.add(\.name, .count(5...) && .alphanumeric)
+///     try validations.add(\.name, .range(5...) && .alphanumeric)
 ///
-public func && (lhs: Validation, rhs: Validation) -> Validation {
-    return AndValidator(lhs, rhs).validation()
+public func &&<T> (lhs: Validator<T>, rhs: Validator<T>) -> Validator<T> {
+    return AndValidator(lhs, rhs).validator()
 }
 
-// MARK: Private
-
 /// Combines two validators, if either both succeed the validation will succeed.
-fileprivate struct AndValidator: Validator {
-    /// See Validator.inverseMessage
+fileprivate struct AndValidator<T>: ValidatorType {
+    /// See `ValidatorType`.
     public var validatorReadable: String {
         return "\(lhs.readable) and \(rhs.readable)"
     }
 
     /// left validator
-    let lhs: Validation
+    let lhs: Validator<T>
 
     /// right validator
-    let rhs: Validation
+    let rhs: Validator<T>
 
     /// create a new and validator
-    init(_ lhs: Validation, _ rhs: Validation) {
+    init(_ lhs: Validator<T>, _ rhs: Validator<T>) {
         self.lhs = lhs
         self.rhs = rhs
     }
 
-    /// See Validator.validate
-    func validate(_ data: ValidationData) throws {
+    /// See `ValidatorType`.
+    func validate(_ data: T) throws {
         var left: ValidationError?
         do {
             try lhs.validate(data)

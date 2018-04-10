@@ -5,56 +5,52 @@ import XCTest
 class ValidationTests: XCTestCase {
     func testValidate() throws {
         let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
+        user.luckyNumber = 7
         user.email = "tanner@vapor.codes"
         try user.validate()
         try user.pet.validate()
     }
 
     func testASCII() throws {
-        try Validation.ascii.validate(.string("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
-        try Validation.ascii.validate(.string("\n\r\t"))
-        XCTAssertThrowsError(try Validation.ascii.validate(.string("\n\r\t\u{129}")))
-        try Validation.ascii.validate(.string(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"))
-        XCTAssertThrowsError(try Validation.ascii.validate(.string("ABCDEFGHIJKLMNOPQR🤠STUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))) {
-            XCTAssert($0 is ValidationError)
-        }
+        try Validator<String>.ascii.validate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+        try Validator<String>.ascii.validate("\n\r\t")
+        XCTAssertThrowsError(try Validator<String>.ascii.validate("\n\r\t\u{129}"))
+        try Validator<String>.ascii.validate(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
+        XCTAssertThrowsError(try Validator<String>.ascii.validate("ABCDEFGHIJKLMNOPQR🤠STUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))
     }
 
     func testAlphanumeric() throws {
-        try Validation.alphanumeric.validate(.string("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
-        XCTAssertThrowsError(try Validation.alphanumeric.validate(.string("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))) {
-            XCTAssert($0 is ValidationError)
-        }
+        try Validator<String>.alphanumeric.validate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+        XCTAssertThrowsError(try Validator<String>.alphanumeric.validate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))
     }
 
     func testEmail() throws {
-        try Validation.email.validate(.string("tanner@vapor.codes"))
-        XCTAssertThrowsError(try Validation.email.validate(.string("tanner@vapor.codestanner@vapor.codes")))
-        XCTAssertThrowsError(try Validation.email.validate(.string("tanner@vapor.codes.")))
-        XCTAssertThrowsError(try Validation.email.validate(.string("tanner@@vapor.codes")))
-        XCTAssertThrowsError(try Validation.email.validate(.string("@vapor.codes")))
-        XCTAssertThrowsError(try Validation.email.validate(.string("tanner@codes")))
-        XCTAssertThrowsError(try Validation.email.validate(.string("asdf"))) { XCTAssert($0 is ValidationError) }
+        try Validator<String>.email.validate("tanner@vapor.codes")
+        XCTAssertThrowsError(try Validator<String>.email.validate("tanner@vapor.codestanner@vapor.codes"))
+        XCTAssertThrowsError(try Validator<String>.email.validate("tanner@vapor.codes."))
+        XCTAssertThrowsError(try Validator<String>.email.validate("tanner@@vapor.codes"))
+        XCTAssertThrowsError(try Validator<String>.email.validate("@vapor.codes"))
+        XCTAssertThrowsError(try Validator<String>.email.validate("tanner@codes"))
+        XCTAssertThrowsError(try Validator<String>.email.validate("asdf"))
     }
     
     func testRange() throws {
-        try Validation.range(-5...5).validate(.int(4))
-        try Validation.range(-5...5).validate(.int(5))
-        try Validation.range(-5...5).validate(.int(-5))
-        XCTAssertThrowsError(try Validation.range(-5...5).validate(.int(6))) { XCTAssert($0 is ValidationError) }
-        XCTAssertThrowsError(try Validation.range(-5...5).validate(.int(-6))) { XCTAssert($0 is ValidationError) }
+        try Validator<Int>.range(-5...5).validate(4)
+        try Validator<Int>.range(-5...5).validate(5)
+        try Validator<Int>.range(-5...5).validate(-5)
+        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(6))
+        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(-6))
 
-        try Validation.range(5...).validate(.int(.max))
-        XCTAssertThrowsError(try Validation.range(...Int.max).validate(UInt.max.convertToValidationData()))
+        try Validator<Int>.range(5...).validate(.max)
 
-        try Validation.range(-5...5).validate(.int(4))
-        XCTAssertThrowsError(try Validation.range(-5...5).validate(.int(6))) { XCTAssert($0 is ValidationError) }
+        try Validator<Int>.range(-5...5).validate(4)
+        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(6))
         
-        try Validation.range(-5..<6).validate(.int(-5))
-        try Validation.range(-5..<6).validate(.int(-4))
-        try Validation.range(-5..<6).validate(.int(5))
-        XCTAssertThrowsError(try Validation.range(-5..<6).validate(.int(-6))) { XCTAssert($0 is ValidationError) }
-        XCTAssertThrowsError(try Validation.range(-5..<6).validate(.int(6))) { XCTAssert($0 is ValidationError) }
+        try Validator<Int>.range(-5..<6).validate(-5)
+        try Validator<Int>.range(-5..<6).validate(-4)
+        try Validator<Int>.range(-5..<6).validate(5)
+        XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(-6))
+        XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(6))
     }
     
     static var allTests = [
@@ -72,6 +68,7 @@ final class User: Validatable, Reflectable, Codable {
     var age: Int
     var email: String?
     var pet: Pet
+    var luckyNumber: Int?
 
     init(id: Int? = nil, name: String, age: Int, pet: Pet) {
         self.id = id
@@ -84,20 +81,18 @@ final class User: Validatable, Reflectable, Codable {
     static func validations() throws -> Validations<User> {
         var validations = Validations(User.self)
         // validate name is at least 5 characters and alphanumeric
-        try validations.add(\.name, .range(5...) && .alphanumeric)
+        try validations.add(\.name, .count(5...) && .alphanumeric)
         // validate age is 18 or older
         try validations.add(\.age, .range(18...))
-        // validate the email exists and is not nil
-        try validations.add(\.email, .email && !.nil)
+        // validate the email is valid and is not nil
+        try validations.add(\.email, !.nil && .email)
+        try validations.add(\.email, .email && !.nil) // test other way
+        // validate the email is valid or is nil
+        try validations.add(\.email, .nil || .email)
+        try validations.add(\.email, .email || .nil) // test other way
+        // validate that the lucky number is nil or is 5 or 7
+        try validations.add(\.luckyNumber, .nil || .in(5, 7))
         return validations
-    }
-
-    static func validations2() throws -> Validations<User> {
-        return try [
-            validationKey(\.name): .range(5...) && .alphanumeric,
-            validationKey(\.age): .range(3...),
-            validationKey(\.pet.name): .range(5...)
-        ]
     }
 }
 
@@ -111,7 +106,7 @@ final class Pet: Codable, Validatable, Reflectable {
 
     static func validations() throws -> Validations<Pet> {
         var validations = Validations(Pet.self)
-        try validations.add(\.name, .range(5...) && .characterSet(.alphanumerics + .whitespaces))
+        try validations.add(\.name, .count(5...) && .characterSet(.alphanumerics + .whitespaces))
         try validations.add(\.age, .range(3...))
         return validations
     }

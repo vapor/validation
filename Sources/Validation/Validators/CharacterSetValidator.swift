@@ -1,9 +1,9 @@
-extension Validation {
+extension Validator {
     /// Validates that all characters in a `String` are ASCII (bytes 0..<128).
     ///
     ///     try validations.add(\.name, .ascii)
     ///
-    public static var ascii: Validation {
+    public static var ascii: Validator<String> {
         return .characterSet(.ascii)
     }
 
@@ -11,7 +11,7 @@ extension Validation {
     ///
     ///     try validations.add(\.name, .alphanumeric)
     ///
-    public static var alphanumeric: Validation {
+    public static var alphanumeric: Validator<String> {
         return .characterSet(.alphanumerics)
     }
 
@@ -19,8 +19,8 @@ extension Validation {
     ///
     ///     try validations.add(\.name, .characterSet(.alphanumerics + .whitespaces))
     ///
-    public static func characterSet(_ characterSet: CharacterSet) -> Validation {
-        return CharacterSetValidator(characterSet).validation()
+    public static func characterSet(_ characterSet: CharacterSet) -> Validator<String> {
+        return CharacterSetValidator(characterSet).validator()
     }
 }
 
@@ -36,7 +36,7 @@ public func +(lhs: CharacterSet, rhs: CharacterSet) -> CharacterSet {
 // MARK: Private
 
 /// Validates that a `String` contains characters in a given `CharacterSet`
-fileprivate struct CharacterSetValidator: Validator {
+fileprivate struct CharacterSetValidator: ValidatorType {
     /// `CharacterSet` to validate against.
     let characterSet: CharacterSet
 
@@ -56,19 +56,14 @@ fileprivate struct CharacterSetValidator: Validator {
     }
 
     /// See `Validator`
-    public func validate(_ data: ValidationData) throws {
-        switch data.storage {
-        case .null: break
-        case .string(let s):
-            if let range = s.rangeOfCharacter(from: characterSet.inverted) {
-                var reason = "contains an invalid character: '\(s[range])'"
-                if characterSet.traits.count > 0 {
-                    let string = characterSet.traits.joined(separator: ", ")
-                    reason += " (allowed: \(string))"
-                }
-                throw BasicValidationError(reason)
+    public func validate(_ s: String) throws {
+        if let range = s.rangeOfCharacter(from: characterSet.inverted) {
+            var reason = "contains an invalid character: '\(s[range])'"
+            if characterSet.traits.count > 0 {
+                let string = characterSet.traits.joined(separator: ", ")
+                reason += " (allowed: \(string))"
             }
-        default: throw BasicValidationError("is not a string")
+            throw BasicValidationError(reason)
         }
     }
 }
