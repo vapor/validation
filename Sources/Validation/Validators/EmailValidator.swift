@@ -1,18 +1,29 @@
-import Foundation
+extension Validation {
+    /// Validators whether a `String` is a valid email address.
+    ///
+    ///     try validations.add(\.email, .email)
+    ///
+    public static var email: Validation {
+        return EmailValidator().validation()
+    }
+}
 
-/// Validates whether a string is a valid email address
-public struct IsEmail: Validator {
-    /// See Validator.inverseMessage
+// MARK: Private
+
+/// Validates whether a string is a valid email address.
+fileprivate struct EmailValidator: Validator {
+    /// See `Validator`.
     public var validatorReadable: String {
         return "valid email address"
     }
 
-    /// creates a new ASCII validator
+    /// Creates a new `EmailValidator`.
     public init() {}
 
-    /// See Validator.validate
+    /// See `Validator`.
     public func validate(_ data: ValidationData) throws {
-        switch data {
+        switch data.storage {
+        case .null: break
         case .string(let s):
             guard
                 let range = s.range(of: "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}", options: [.regularExpression, .caseInsensitive]),

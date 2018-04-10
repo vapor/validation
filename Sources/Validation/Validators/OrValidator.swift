@@ -1,24 +1,29 @@
-/// Combines two validators into an or validator
-public func || (lhs: Validator, rhs: Validator) -> Validator {
-    return OrValidator(lhs, rhs)
+/// Combines two `Validation`s, succeeding if either of the `Validation`s does not fail.
+///
+///     // validate email is valid or is nil
+///     try validations.add(\.email, .email || .nil)
+///
+public func || (lhs: Validation, rhs: Validation) -> Validation {
+    return OrValidator(lhs, rhs).validation()
 }
 
-/// Combines two validators, if either is true
-/// the validation will succeed.
-internal struct OrValidator: Validator {
+// MARK: Private
+
+/// Combines two validators, if either is true the validation will succeed.
+fileprivate struct OrValidator: Validator {
     /// See Validator.inverseMessage
     public var validatorReadable: String {
-        return "\(lhs.validatorReadable) or \(rhs.validatorReadable)"
+        return "\(lhs.readable) or \(rhs.readable)"
     }
 
     /// left validator
-    let lhs: Validator
+    let lhs: Validation
 
     /// right validator
-    let rhs: Validator
+    let rhs: Validation
 
-    /// create a new or validator
-    init(_ lhs: Validator, _ rhs: Validator) {
+    /// Creates a new `OrValidator`.
+    init(_ lhs: Validation, _ rhs: Validation) {
         self.lhs = lhs
         self.rhs = rhs
     }
@@ -38,7 +43,7 @@ internal struct OrValidator: Validator {
 }
 
 /// Error thrown if or validation fails
-internal struct OrValidatorError: ValidationError {
+fileprivate struct OrValidatorError: ValidationError {
     /// error thrown by left validator
     let left: ValidationError
 

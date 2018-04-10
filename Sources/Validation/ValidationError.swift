@@ -17,7 +17,7 @@ extension ValidationError {
 
 /// Errors that can be thrown while working with validation
 public struct BasicValidationError: ValidationError {
-    /// See Debuggable.reason
+    /// See `Debuggable`
     public var reason: String {
         let path: String
         if self.path.count > 0 {

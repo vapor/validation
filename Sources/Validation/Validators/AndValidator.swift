@@ -1,24 +1,28 @@
-/// Combines two validators into an and validator
-public func && (lhs: Validator, rhs: Validator) -> Validator {
-    return AndValidator(lhs, rhs)
+/// Combines two `Validation`s using AND logic, succeeding if both validations succeed without error.
+///
+///     try validations.add(\.name, .count(5...) && .alphanumeric)
+///
+public func && (lhs: Validation, rhs: Validation) -> Validation {
+    return AndValidator(lhs, rhs).validation()
 }
 
-/// Combines two validators, if either both succeed
-/// the validation will succeed.
-internal struct AndValidator: Validator {
+// MARK: Private
+
+/// Combines two validators, if either both succeed the validation will succeed.
+fileprivate struct AndValidator: Validator {
     /// See Validator.inverseMessage
     public var validatorReadable: String {
-        return "\(lhs.validatorReadable) and \(rhs.validatorReadable)"
+        return "\(lhs.readable) and \(rhs.readable)"
     }
 
     /// left validator
-    let lhs: Validator
+    let lhs: Validation
 
     /// right validator
-    let rhs: Validator
+    let rhs: Validation
 
     /// create a new and validator
-    init(_ lhs: Validator, _ rhs: Validator) {
+    init(_ lhs: Validation, _ rhs: Validation) {
         self.lhs = lhs
         self.rhs = rhs
     }
@@ -46,7 +50,7 @@ internal struct AndValidator: Validator {
 }
 
 /// Error thrown if and validation fails
-internal struct AndValidatorError: ValidationError {
+fileprivate struct AndValidatorError: ValidationError {
     /// error thrown by left validator
     let left: ValidationError?
 

@@ -1,6 +1,10 @@
-/// A model property containing the Swift key path for accessing it.
-public struct ValidationKey: Hashable {
-    /// See `Hashable.hashValue`
+/// Represents a key on a `Validatable` model referencing `ValidationData`. This is combined with
+/// a `Validtion` to run on that data in `Validations`.
+///
+///     let key: ValidationKey<User> = User.validationKey(\.name)
+///
+public struct ValidationKey<M>: Hashable where M: Validatable {
+    /// See `Hashable`
     public var hashValue: Int {
         return keyPath.hashValue
     }
@@ -10,8 +14,8 @@ public struct ValidationKey: Hashable {
         return lhs.keyPath == rhs.keyPath
     }
 
-    /// The Swift keypath
-    fileprivate var keyPath: AnyKeyPath
+    /// The Swift keypath. Use `get(from:)` to access value from the model.
+    private var keyPath: AnyKeyPath
 
     /// Path segments to this key's value.
     public var path: [String]
@@ -25,25 +29,45 @@ public struct ValidationKey: Hashable {
         self.path = path
         self.type = type
     }
-}
 
-extension Validatable {
-    /// Accesses the `ValidationDataRepresentable`
-    public func getValidationData(at validationKey: ValidationKey) throws -> ValidationData {
-        return try (self[keyPath: validationKey.keyPath] as ValidationDataRepresentable).makeValidationData()
+    /// Accesses the `ValidationData`.
+    ///
+    ///     let nameKey: ValidationKey<User> = User.validationKey(\.name)
+    ///     let name = try nameKey.get(from: user)
+    ///     print(name) // ValidationData
+    ///
+    /// - parameters:
+    ///     - model: `Validatable` model to access the `ValidationData` from.
+    public func get(from model: M) throws -> ValidationData {
+        return try (model[keyPath: keyPath] as ValidationDataRepresentable).convertToValidationData()
     }
 }
 
 extension Validatable {
-    /// Create a validation key for the supplied key path.
-    public static func key<T>(_ keyPath: KeyPath<Self, T>, at path: [String]) -> ValidationKey where T: ValidationDataRepresentable {
+    /// Create a `ValidationKey` for the supplied `KeyPath` and readable path.
+    ///
+    ///     let key: ValidationKey<User> = User.validationKey(\.name, at: ["name"])
+    ///
+    /// - parameters:
+    ///     - keyPath: `KeyPath` to validatable property on this model.
+    ///     - path: Readable path, will be displayed when showing errors.
+    public static func validationKey<T>(_ keyPath: KeyPath<Self, T>, at path: [String]) -> ValidationKey<Self>
+        where T: ValidationDataRepresentable
+    {
         return ValidationKey(keyPath: keyPath, path: path, type: T.self)
     }
 }
 
 extension Validatable where Self: Reflectable {
-    /// Create a validation key for the supplied key path.
-    public static func key<T>(_ keyPath: KeyPath<Self, T>) -> ValidationKey where T: ValidationDataRepresentable {
-        return try! self.key(keyPath, at: Self.reflectProperty(forKey: keyPath)?.path ?? [])
+    /// Create a `ValidationKey` for the supplied `KeyPath`. The readable path will be reflected.
+    ///
+    ///     let key: ValidationKey<User> = User.validationKey(\.name)
+    ///
+    /// - parameters:
+    ///     - keyPath: `KeyPath` to validatable property on this model.
+    public static func validationKey<T>(_ keyPath: KeyPath<Self, T>) throws -> ValidationKey<Self>
+        where T: ValidationDataRepresentable
+    {
+        return try validationKey(keyPath, at: Self.reflectProperty(forKey: keyPath)?.path ?? [])
     }
 }
