@@ -6,8 +6,8 @@ public prefix func ! (rhs: Validator) -> Validator {
 /// Inverts a validator
 internal struct NotValidator: Validator {
     /// See Validator.inverseMessage
-    public var inverseMessage: String {
-        return "not \(rhs.inverseMessage)"
+    public var validatorReadable: String {
+        return "not \(rhs.validatorReadable)"
     }
 
     /// right validator
@@ -27,7 +27,7 @@ internal struct NotValidator: Validator {
             error = e
         }
         guard error != nil else {
-            throw BasicValidationError("is \(rhs.inverseMessage)")
+            throw BasicValidationError("is \(rhs.validatorReadable)")
         }
     }
 }

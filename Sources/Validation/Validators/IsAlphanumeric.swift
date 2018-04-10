@@ -1,27 +1,21 @@
-import Foundation
-
-private let alphanumeric = "abcdefghijklmnopqrstuvwxyz0123456789"
-
 /// Validates whether a string contains only alphanumeric characters
-public struct IsAlphanumeric: Validator {
+public struct IsAlphanumeric: CharacterSetValidator {
     /// See Validator.inverseMessage
-    public var inverseMessage: String {
+    public var validatorReadable: String {
         return "alphanumeric"
     }
 
-    /// creates a new alphanumeric validator
-    public init() {}
+    public let validatorCharacterSet: CharacterSet
 
-    /// See Validator.validate
-    public func validate(_ data: ValidationData) throws {
-        switch data {
-        case .string(let s):
-            for char in s.lowercased() {
-                guard alphanumeric.contains(char) else {
-                    throw BasicValidationError("is not alphanumeric")
-                }
-            }
-        default: throw BasicValidationError("is not a string")
+    /// creates a new alphanumeric validator
+    public init(whitespaces: Bool = false, newlines: Bool = false) {
+        var characterSet: CharacterSet = .alphanumerics
+        if whitespaces {
+            characterSet = characterSet.union(.whitespaces)
         }
+        if newlines {
+            characterSet = characterSet.union(.newlines)
+        }
+        self.validatorCharacterSet = characterSet
     }
 }

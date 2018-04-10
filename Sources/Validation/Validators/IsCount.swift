@@ -4,7 +4,7 @@ import Foundation
 /// note: strings have length checked, while integers, doubles, and dates have their values checked
 public struct IsCount<T>: Validator where T: Comparable {
     /// See Validator.inverseMessage
-    public var inverseMessage: String {
+    public var validatorReadable: String {
         if let min = self.min, let max = self.max {
             return "larger than \(min) or smaller than \(max)"
         } else if let min = self.min {

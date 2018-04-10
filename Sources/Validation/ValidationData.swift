@@ -11,7 +11,6 @@ public enum ValidationData {
     case double(Double)
     case array([ValidationData])
     case dictionary([String: ValidationData])
-    case validatable(Validatable)
     case null
 }
 
@@ -19,7 +18,7 @@ public enum ValidationData {
 /// Custom types you want to validate must conform to this protocol.
 public protocol ValidationDataRepresentable {
     /// Converts to validation data
-    func makeValidationData() -> ValidationData
+    func makeValidationData() throws -> ValidationData
 }
 
 extension Bool: ValidationDataRepresentable {
@@ -129,11 +128,11 @@ extension Date: ValidationDataRepresentable {
 
 extension Array: ValidationDataRepresentable {
     /// See ValidationDataRepresentable.makeValidationData
-    public func makeValidationData() -> ValidationData {
+    public func makeValidationData() throws -> ValidationData {
         var items: [ValidationData] = []
         for el in self {
             // FIXME: conditional conformance
-            items.append((el as! ValidationDataRepresentable).makeValidationData())
+            try items.append((el as! ValidationDataRepresentable).makeValidationData())
         }
         return .array(items)
     }
@@ -141,11 +140,11 @@ extension Array: ValidationDataRepresentable {
 
 extension Dictionary: ValidationDataRepresentable {
     /// See ValidationDataRepresentable.makeValidationData
-    public func makeValidationData() -> ValidationData {
+    public func makeValidationData() throws  -> ValidationData {
         var items: [String: ValidationData] = [:]
         for (key, el) in self {
             // FIXME: conditional conformance
-            items[(key as! String)] = (el as! ValidationDataRepresentable).makeValidationData()
+            items[(key as! String)] = try (el as! ValidationDataRepresentable).makeValidationData()
         }
         return .dictionary(items)
     }
@@ -153,10 +152,10 @@ extension Dictionary: ValidationDataRepresentable {
 
 extension Optional: ValidationDataRepresentable {
     /// See ValidationDataRepresentable.makeValidationData
-    public func makeValidationData() -> ValidationData {
+    public func makeValidationData() throws -> ValidationData {
         switch self {
         case .none: return .null
-        case .some(let s): return (s as? ValidationDataRepresentable)?.makeValidationData() ?? .null
+        case .some(let s): return try (s as? ValidationDataRepresentable)?.makeValidationData() ?? .null
         }
     }
 }

@@ -1,7 +1,7 @@
 /// Validates that the data is nil
 public struct IsNil: Validator {
     /// See Validator.inverseMessage
-    public var inverseMessage: String {
+    public var validatorReadable: String {
         return "nil"
     }
 

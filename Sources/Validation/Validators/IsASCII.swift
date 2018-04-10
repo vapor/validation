@@ -1,24 +1,23 @@
 import Foundation
 
 /// Validates whether a string contains only ASCII characters
-public struct IsASCII: Validator {
-    /// See Validator.inverseMessage
-    public var inverseMessage: String {
-        return "ASCII"
+public struct IsASCII: CharacterSetValidator {
+    /// See `CharacterSetValidator`.
+    public var validatorCharacterSet: CharacterSet {
+        return .ascii
     }
 
-    /// creates a new ASCII validator
-    public init() {}
+    /// Creates a new `IsASCII` validator.
+    public init() { }
+}
 
-    /// See Validator.validate
-    public func validate(_ data: ValidationData) throws {
-        switch data {
-        case .string(let s):
-            guard s.range(of: "^[\\x09-\\x0d -~]+$", options: [.regularExpression, .caseInsensitive]) != nil else {
-                throw BasicValidationError("is not ASCII")
-            }
-        default:
-            throw BasicValidationError("is not a string")
+extension CharacterSet {
+    /// ASCII (byte 0..<128) character set.
+    fileprivate static var ascii: CharacterSet {
+        var ascii: CharacterSet = .init()
+        for i in 0..<128 {
+            ascii.insert(Unicode.Scalar(i)!)
         }
+        return ascii
     }
 }

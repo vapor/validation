@@ -7,8 +7,8 @@ public func && (lhs: Validator, rhs: Validator) -> Validator {
 /// the validation will succeed.
 internal struct AndValidator: Validator {
     /// See Validator.inverseMessage
-    public var inverseMessage: String {
-        return "\(lhs.inverseMessage) and \(rhs.inverseMessage)"
+    public var validatorReadable: String {
+        return "\(lhs.validatorReadable) and \(rhs.validatorReadable)"
     }
 
     /// left validator

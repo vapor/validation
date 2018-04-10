@@ -7,8 +7,8 @@ public func || (lhs: Validator, rhs: Validator) -> Validator {
 /// the validation will succeed.
 internal struct OrValidator: Validator {
     /// See Validator.inverseMessage
-    public var inverseMessage: String {
-        return "\(lhs.inverseMessage) or \(rhs.inverseMessage)"
+    public var validatorReadable: String {
+        return "\(lhs.validatorReadable) or \(rhs.validatorReadable)"
     }
 
     /// left validator

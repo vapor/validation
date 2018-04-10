@@ -6,13 +6,14 @@ class ValidationTests: XCTestCase {
     func testValidate() throws {
         let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski"))
         try user.validate()
+        try user.pet.validate()
     }
 
     func testASCII() throws {
         try IsASCII().validate(.string("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
         try IsASCII().validate(.string("\n\r\t"))
+        XCTAssertThrowsError(try IsASCII().validate(.string("\n\r\t\u{129}")))
         try IsASCII().validate(.string(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"))
-
         XCTAssertThrowsError(try IsASCII().validate(.string("ABCDEFGHIJKLMNOPQR🤠STUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))) {
             XCTAssert($0 is ValidationError)
         }
@@ -27,6 +28,11 @@ class ValidationTests: XCTestCase {
 
     func testEmail() throws {
         try IsEmail().validate(.string("tanner@vapor.codes"))
+        XCTAssertThrowsError(try IsEmail().validate(.string("tanner@vapor.codestanner@vapor.codes")))
+        XCTAssertThrowsError(try IsEmail().validate(.string("tanner@vapor.codes.")))
+        XCTAssertThrowsError(try IsEmail().validate(.string("tanner@@vapor.codes")))
+        XCTAssertThrowsError(try IsEmail().validate(.string("@vapor.codes")))
+        XCTAssertThrowsError(try IsEmail().validate(.string("tanner@codes")))
         XCTAssertThrowsError(try IsEmail().validate(.string("asdf"))) { XCTAssert($0 is ValidationError) }
     }
     
@@ -61,7 +67,7 @@ class ValidationTests: XCTestCase {
     ]
 }
 
-final class User: Validatable, Reflectable {
+final class User: Validatable, Reflectable, Codable {
     var id: Int?
     var name: String
     var age: Int
@@ -75,15 +81,19 @@ final class User: Validatable, Reflectable {
     }
     
     static var validations: Validations = [
-        key(\.name): IsCount(5...),
+        key(\.name): IsCount(5...) && IsAlphanumeric(),
         key(\.age): IsCount(3...),
         key(\.pet.name): IsCount(5...)
     ]
 }
 
-final class Pet: Codable {
+final class Pet: Codable, Validatable {
     var name: String
     init(name: String) {
         self.name = name
     }
+
+    static var validations: Validations = [
+        key(\.name, at: ["name"]): IsCount(5...) && IsAlphanumeric(whitespaces: true)
+    ]
 }
