@@ -4,7 +4,7 @@ import XCTest
 
 class ValidationTests: XCTestCase {
     func testValidate() throws {
-        let user = User(name: "Tanner😄", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
+        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
         user.luckyNumber = 7
         user.email = "tanner@vapor.codes"
         try user.validate()
