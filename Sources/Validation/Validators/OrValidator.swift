@@ -13,7 +13,7 @@ public func ||<T> (lhs: Validator<T>, rhs: Validator<T>) -> Validator<T> {
 fileprivate struct OrValidator<T>: ValidatorType {
     /// See Validator.inverseMessage
     public var validatorReadable: String {
-        return "\(lhs.readable) or \(rhs.readable)"
+        return "\(lhs.readable) or is \(rhs.readable)"
     }
 
     /// left validator

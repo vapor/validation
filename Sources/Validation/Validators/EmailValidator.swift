@@ -14,7 +14,7 @@ extension Validator where T == String {
 fileprivate struct EmailValidator: ValidatorType {
     /// See `ValidatorType`.
     public var validatorReadable: String {
-        return "valid email address"
+        return "a valid email address"
     }
 
     /// Creates a new `EmailValidator`.

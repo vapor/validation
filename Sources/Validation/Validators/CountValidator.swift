@@ -38,12 +38,19 @@ extension Validator where T: Collection {
 fileprivate struct CountValidator<T>: ValidatorType where T: Collection {
     /// See `ValidatorType`.
     var validatorReadable: String {
+        let x: String
+        if T.self is String.Type {
+            x = "characters"
+        } else {
+            x = "items"
+        }
+
         if let min = self.min, let max = self.max {
-            return "larger than \(min) or smaller than \(max)"
+            return "between \(min) and \(max) \(x)"
         } else if let min = self.min {
-            return "larger than \(min)"
+            return "at least \(min) \(x)"
         } else if let max = self.max {
-            return "smaller than \(max)"
+            return "at most \(max) \(x)"
         } else {
             return "valid"
         }

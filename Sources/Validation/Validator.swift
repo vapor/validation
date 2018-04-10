@@ -10,7 +10,7 @@
 ///         static var myValidation: Validation { return MyValidator().validator() }
 ///     }
 ///
-public struct Validator<T> {
+public struct Validator<T>: CustomStringConvertible {
     /// Suitable for placing after `is` _and_ `is not`.
     ///
     ///     is alphanumeric
@@ -25,12 +25,17 @@ public struct Validator<T> {
     /// - throws: `ValidationError` if the data is not valid, or another error if something fails.
     private let closure: (T) throws -> Void
 
+    /// See `CustomStringConvertible`.
+    public var description: String {
+        return readable
+    }
+
     /// Creates a new `Validation`.
     ///
     /// - parameters:
     ///     - readable: Readable name, suitable for placing after `is` _and_ `is not`.
     ///     - validate: Validates the supplied `ValidationData`, throwing an error if it is not valid.
-    public init(_ readable: String = "n/a", _ closure: @escaping (T) throws -> Void) {
+    public init(_ readable: String, _ closure: @escaping (T) throws -> Void) {
         self.readable = readable
         self.closure = closure
     }

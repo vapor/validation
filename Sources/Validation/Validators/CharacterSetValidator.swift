@@ -44,9 +44,9 @@ fileprivate struct CharacterSetValidator: ValidatorType {
     public var validatorReadable: String {
         if characterSet.traits.count > 0 {
             let string = characterSet.traits.joined(separator: ", ")
-            return "in \(string)"
+            return "in character set (\(string))"
         } else {
-            return "in required character set"
+            return "in character set"
         }
     }
 

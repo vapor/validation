@@ -23,7 +23,7 @@ public struct BasicValidationError: ValidationError {
     public var reason: String {
         let path: String
         if self.path.count > 0 {
-            path = "`" + self.path.joined(separator: ".") + "`"
+            path = "'" + self.path.joined(separator: ".") + "'"
         } else {
             path = "data"
         }

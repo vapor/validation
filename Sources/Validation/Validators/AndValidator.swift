@@ -10,7 +10,7 @@ public func &&<T> (lhs: Validator<T>, rhs: Validator<T>) -> Validator<T> {
 fileprivate struct AndValidator<T>: ValidatorType {
     /// See `ValidatorType`.
     public var validatorReadable: String {
-        return "\(lhs.readable) and \(rhs.readable)"
+        return "\(lhs.readable) and is \(rhs.readable)"
     }
 
     /// left validator

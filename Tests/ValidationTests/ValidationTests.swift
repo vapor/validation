@@ -4,7 +4,7 @@ import XCTest
 
 class ValidationTests: XCTestCase {
     func testValidate() throws {
-        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
+        let user = User(name: "Tanner😄", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
         user.luckyNumber = 7
         user.email = "tanner@vapor.codes"
         try user.validate()
@@ -92,6 +92,7 @@ final class User: Validatable, Reflectable, Codable {
         try validations.add(\.email, .email || .nil) // test other way
         // validate that the lucky number is nil or is 5 or 7
         try validations.add(\.luckyNumber, .nil || .in(5, 7))
+        print(validations)
         return validations
     }
 }

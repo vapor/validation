@@ -22,7 +22,8 @@ extension Validator where T: Equatable {
 fileprivate struct InValidator<T>: ValidatorType where T: Equatable {
     /// See `ValidatorType`.
     public var validatorReadable: String {
-        return "valid email address"
+        let all = array.map { "\($0)" }.joined(separator: ", ")
+        return "in (\(all))"
     }
 
     /// Array to check against.
@@ -36,8 +37,7 @@ fileprivate struct InValidator<T>: ValidatorType where T: Equatable {
     /// See `Validator`.
     public func validate(_ item: T) throws {
         guard array.contains(item) else {
-            let all = array.map { "\($0)" }.joined(separator: ", ")
-            throw BasicValidationError("is not in (\(all))")
+            throw BasicValidationError("is not \(validatorReadable)")
         }
     }
 }

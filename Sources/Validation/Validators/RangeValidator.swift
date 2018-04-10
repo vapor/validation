@@ -41,11 +41,11 @@ fileprivate struct RangeValidator<T>: ValidatorType where T: Comparable {
     /// See `ValidatorType`.
     var validatorReadable: String {
         if let min = self.min, let max = self.max {
-            return "larger than \(min) or smaller than \(max)"
+            return "between \(min) and \(max)"
         } else if let min = self.min {
-            return "larger than \(min)"
+            return "at least \(min)"
         } else if let max = self.max {
-            return "smaller than \(max)"
+            return "at most \(max)"
         } else {
             return "valid"
         }
