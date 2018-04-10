@@ -1,4 +1,4 @@
-/// Combines two `Validation`s using AND logic, succeeding if both validations succeed without error.
+/// Combines two `Validator`s using AND logic, succeeding if both `Validator`s succeed without error.
 ///
 ///     try validations.add(\.name, .range(5...) && .alphanumeric)
 ///

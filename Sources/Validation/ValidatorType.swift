@@ -1,14 +1,14 @@
 /// Capable of validating validation data or throwing a validation error.
-/// Use this protocol to organize code for creating `Validation`s.
+/// Use this protocol to organize code for creating `Validator`s.
 ///
-///     let validation: Validation = MyValidator().validation()
+///     let validator: Validator<T> = MyValidator().validator()
 ///
-/// See `Validation` for more information.
+/// See `Validator` for more information.
 public protocol ValidatorType {
     /// Data type to validate.
     associatedtype ValidationData
 
-    /// Suitable for placing after `is` _and_ `is not`.
+    /// Readable name explaining what this `Validator` does. Suitable for placing after `is` _and_ `is not`.
     ///
     ///     is alphanumeric
     ///     is not alphanumeric
@@ -23,9 +23,8 @@ public protocol ValidatorType {
     func validate(_ data: ValidationData) throws
 }
 
-
 extension ValidatorType {
-    /// Create a `Validation` for this `Validator`.
+    /// Create a `Validator` for this `ValidatorType`.
     public func validator() -> Validator<ValidationData> {
         return Validator(validatorReadable, validate)
     }

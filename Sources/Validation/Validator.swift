@@ -1,17 +1,17 @@
-/// A discrete validation. Usually created by calling `ValidatorType.validator()`.
+/// A discrete `Validator`. Usually created by calling `ValidatorType.validator()`.
 ///
-/// All validation operators (`&&`, `||`, `!`, etc) work on `Validation`.
+/// All validation operators (`&&`, `||`, `!`, etc) work on `Validator`s.
 ///
 ///     try validations.add(\.firstName, .count(5...) && .alphanumeric)
 ///
-/// Adding static properties to this type will enable leading-dot syntax when constructing validations.
+/// Adding static properties to this type will enable leading-dot syntax when composing validators.
 ///
 ///     extension Validator {
-///         static var myValidation: Validation { return MyValidator().validator() }
+///         static var myValidation: Validator<T> { return MyValidator().validator() }
 ///     }
 ///
 public struct Validator<T>: CustomStringConvertible {
-    /// Suitable for placing after `is` _and_ `is not`.
+    /// Readable name explaining what this `Validator` does. Must be suitable for placing after `is` _and_ `is not.
     ///
     ///     is alphanumeric
     ///     is not alphanumeric

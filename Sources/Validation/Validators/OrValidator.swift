@@ -1,4 +1,4 @@
-/// Combines two `Validation`s, succeeding if either of the `Validation`s does not fail.
+/// Combines two `Validator`s, succeeding if either of the `Validator`s does not fail.
 ///
 ///     // validate email is valid or is nil
 ///     try validations.add(\.email, .email || .nil)

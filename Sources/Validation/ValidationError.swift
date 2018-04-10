@@ -1,6 +1,7 @@
 import Debugging
 
-/// A validation error that supports dynamic key paths.
+/// A validation error that supports dynamic key paths. These key paths will be automatically
+/// combined to support nested validations.
 ///
 /// See `BasicValidationError` for a default implementation.
 public protocol ValidationError: Debuggable {
