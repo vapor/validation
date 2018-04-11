@@ -27,7 +27,7 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
         })
     }
 
-    /// Adds a custom `Validation` to at the supplied key path and readable path.
+    /// Adds a custom `Validation` at the supplied key path and readable path.
     ///
     ///     try validations.add(\.name, at: ["name"], "is vapor") { name in
     ///         guard name == "vapor" else { throw }
@@ -84,7 +84,7 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
 }
 
 extension Validations where M: Reflectable {
-    /// Adds a new `Validation` to at the supplied key path. Readable path will be reflected.
+    /// Adds a new `Validation` at the supplied key path. Readable path will be reflected.
     ///
     ///     try validations.add(\.name, .count(5...) && .alphanumeric)
     ///
@@ -96,7 +96,7 @@ extension Validations where M: Reflectable {
     }
 
 
-    /// Adds a new custom `Validation` to at the supplied key path. Readable path will be reflected.
+    /// Adds a new custom `Validation` at the supplied key path. Readable path will be reflected.
     ///
     ///     try validations.add(\.name, "is vapor") { name in
     ///         guard name == "vapor" else { throw }
