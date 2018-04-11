@@ -1,25 +1,33 @@
-/// Inverts a validator into a not validator
-public prefix func ! (rhs: Validator) -> Validator {
-    return NotValidator(rhs)
+/// Inverts a `Validation`.
+///
+///     try validations.add(\.email, .email && !.nil)
+///
+public prefix func !<T> (rhs: Validator<T>) -> Validator<T> {
+    return NotValidator(rhs).validator()
 }
 
+// MARK: Private
+
 /// Inverts a validator
-internal struct NotValidator: Validator {
-    /// See Validator.inverseMessage
-    public var inverseMessage: String {
-        return "not \(rhs.inverseMessage)"
+fileprivate struct NotValidator<T>: ValidatorType {
+    /// See `ValidatorType`.
+    typealias ValidationData = T
+
+    /// See `ValidatorType`
+    public var validatorReadable: String {
+        return "not \(rhs.readable)"
     }
 
-    /// right validator
-    let rhs: Validator
+    /// The inverted `Validator`.
+    let rhs: Validator<T>
 
-    /// create a new not validator
-    init(_ rhs: Validator) {
+    /// Creates a new `NotValidator`.
+    init(_ rhs: Validator<T>) {
         self.rhs = rhs
     }
 
-    /// See Validator.validate
-    func validate(_ data: ValidationData) throws {
+    /// See `ValidatorType`
+    func validate(_ data: T) throws {
         var error: ValidationError?
         do {
             try rhs.validate(data)
@@ -27,7 +35,7 @@ internal struct NotValidator: Validator {
             error = e
         }
         guard error != nil else {
-            throw BasicValidationError("is \(rhs.inverseMessage)")
+            throw BasicValidationError("is \(rhs.readable)")
         }
     }
 }
