@@ -15,12 +15,12 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
 
     /// Adds a new `Validation` at the supplied key path and readable path.
     ///
-    ///     try validations.add(\.name, at: ["name"], .count(5...) && .alphanumeric)
+    ///     validations.add(\.name, at: ["name"], .count(5...) && .alphanumeric)
     ///
     /// - parameters:
     ///     - keyPath: `KeyPath` to validatable property.
     ///     - path: Readable path. Will be displayed when showing errors.
-    ///     - validation: `Validation` to run on this property.
+    ///     - validator: `Validator` to run on this property.
     public mutating func add<T>(_ keyPath: KeyPath<M, T>, at path: [String], _ validator: Validator<T>) {
         add(keyPath, at: path, "is " + validator.readable, { value in
             try validator.validate(value)
@@ -29,7 +29,7 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
 
     /// Adds a custom `Validation` at the supplied key path and readable path.
     ///
-    ///     try validations.add(\.name, at: ["name"], "is vapor") { name in
+    ///     validations.add(\.name, at: ["name"], "is vapor") { name in
     ///         guard name == "vapor" else { throw }
     ///     }
     ///
@@ -51,7 +51,7 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
 
     /// Adds a custom `Validation` to the `Validations`.
     ///
-    ///     try validations.add("name: is vapor") { model in
+    ///     validations.add("name: is vapor") { model in
     ///         guard model.name == "vapor" else { throw }
     ///     }
     ///
@@ -90,11 +90,10 @@ extension Validations where M: Reflectable {
     ///
     /// - parameters:
     ///     - keyPath: `KeyPath` to validatable property.
-    ///     - validation: `Validation` to run on this property.
+    ///     - validator: `Validator` to run on this property.
     public mutating func add<T>(_ keyPath: KeyPath<M, T>, _ validator: Validator<T>) throws {
         try add(keyPath, at: M.reflectProperty(forKey: keyPath)?.path ?? [], validator)
     }
-
 
     /// Adds a new custom `Validation` at the supplied key path. Readable path will be reflected.
     ///
@@ -127,7 +126,7 @@ fileprivate struct ValidateErrors: ValidationError {
             var mutableError = error
             mutableError.path = path + error.path
             return mutableError.reason
-            }.joined(separator: ", ")
+        }.joined(separator: ", ")
     }
 
     /// creates a new validatable error
