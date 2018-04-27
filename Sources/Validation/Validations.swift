@@ -9,7 +9,7 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
     }
 
     /// Create an empty `Validations` struct. You can also use an empty array `[]`.
-    public init(_ model: M.Type) {
+    public init(_ model: M.Type = M.self) {
         self.storage = []
     }
 
