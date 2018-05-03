@@ -111,18 +111,16 @@ extension Validations where M: Reflectable {
     }
 }
 
-// MARK: Private
-
 /// A collection of errors thrown by validatable models validations
-fileprivate struct ValidateErrors: ValidationError {
+public struct ValidateErrors: ValidationError {
     /// the errors thrown
-    var errors: [ValidationError]
+    public var errors: [ValidationError]
 
     /// See ValidationError.keyPath
-    var path: [String]
+    public var path: [String]
 
     /// See ValidationError.reason
-    var reason: String {
+    public var reason: String {
         return errors.map { error in
             var mutableError = error
             mutableError.path = path + error.path
@@ -131,7 +129,7 @@ fileprivate struct ValidateErrors: ValidationError {
     }
 
     /// creates a new validatable error
-    init(_ errors: [ValidationError]) {
+    public init(_ errors: [ValidationError]) {
         self.errors = errors
         self.path = []
     }
