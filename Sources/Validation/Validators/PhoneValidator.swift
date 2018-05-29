@@ -1,18 +1,18 @@
 
 public enum PhoneFormat {
-    /// Example: `2397777777`
+    /// Only uses numbers. Example: `2397777777`
     case plain
-    /// Example: `(239)777-7777`
+    /// Uses Dash and Parenthesis. Example: `(239)777-7777`
     case dashWithParenthesis
-    /// Example: `239-777-7777`
+    /// Only uses Dashes. Example: `239-777-7777`
     case dashOnly
 
     var regex: String {
         switch self {
         case .plain:
-            return simpleRegex
+            return plainRegex
         case .dashWithParenthesis:
-            return parenthesisWithDashRegex
+            return dashWithParenthesisRegex
         case .dashOnly:
             return onlyDashRegex
         }
@@ -22,11 +22,11 @@ public enum PhoneFormat {
 // MARK: PhoneFormat Regex
 private extension PhoneFormat {
 
-    var simpleRegex: String {
+    var plainRegex: String {
         return "[0-9]{3}[0-9]{3}[0-9]{4}$"
     }
 
-    var parenthesisWithDashRegex: String {
+    var dashWithParenthesisRegex: String {
         return "\\([0-9]{3}\\)[0-9]{3}-[0-9]{4}$"
     }
 
@@ -36,17 +36,16 @@ private extension PhoneFormat {
 }
 
 public enum PhoneType {
-    /// +1 `PhoneFormat`
-    case prefix(PhoneFormat)
+    /// Uses country code and always adds an empty space after. Example: `1 (239)555-7777`.
+    case useCountryCode(PhoneFormat)
     /// `PhoneFormat`
-    case simple(PhoneFormat)
+    case useSimple(PhoneFormat)
 
     var regex: String {
         switch self {
-        case .prefix(let format):
-            return format == .dashOnly ?
-                "\(prefixRegex)-\(format.regex)" : "\(prefixRegex)\(format.regex)"
-        case .simple(let format):
+        case .useCountryCode(let format):
+            return "\(countryCodeRegex) \(format.regex)"
+        case .useSimple(let format):
             return format.regex
         }
     }
@@ -54,7 +53,7 @@ public enum PhoneType {
 
 private extension PhoneType {
 
-    var prefixRegex: String {
+    var countryCodeRegex: String {
         return "[0-9]{1,4}"
     }
 }
