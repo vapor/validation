@@ -4,7 +4,7 @@ import XCTest
 
 class ValidationTests: XCTestCase {
     func testValidate() throws {
-        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
+        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4), phone:"1(239)999-7575")
         user.luckyNumber = 7
         user.email = "tanner@vapor.codes"
         try user.validate()
@@ -52,6 +52,22 @@ class ValidationTests: XCTestCase {
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(-6))
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(6))
     }
+
+    func testPhone() throws {
+        try Validator<String>.phone(type: .simple(.plain)).validate("2399997777")
+        try Validator<String>.phone(type: .simple(.dashOnly)).validate("239-999-7777")
+        try Validator<String>.phone(type: .simple(.dashWithParenthesis)).validate("(239)999-7777")
+        try Validator<String>.phone(type: .prefix(.plain)).validate("12399997777")
+        try Validator<String>.phone(type: .prefix(.dashOnly)).validate("72-239-999-7777")
+        try Validator<String>.phone(type: .prefix(.dashWithParenthesis)).validate("99(239)999-7777")
+
+        XCTAssertThrowsError(try Validator<String>.phone(type: .simple(.plain)).validate("23999977777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .simple(.dashOnly)).validate("1(239)999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .simple(.dashWithParenthesis)).validate("239-999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .prefix(.plain)).validate("1239-999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .prefix(.dashOnly)).validate("72(239)999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .prefix(.dashWithParenthesis)).validate("99-239-999-7777"))
+    }
     
     static var allTests = [
         ("testValidate", testValidate),
@@ -59,6 +75,7 @@ class ValidationTests: XCTestCase {
         ("testAlphanumeric", testAlphanumeric),
         ("testEmail", testEmail),
         ("testRange", testRange),
+        ("testPhone", testPhone)
     ]
 }
 
@@ -69,12 +86,14 @@ final class User: Validatable, Reflectable, Codable {
     var email: String?
     var pet: Pet
     var luckyNumber: Int?
+    var phone: String
 
-    init(id: Int? = nil, name: String, age: Int, pet: Pet) {
+    init(id: Int? = nil, name: String, age: Int, pet: Pet, phone: String) {
         self.id = id
         self.name = name
         self.age = age
         self.pet = pet
+        self.phone = phone
     }
 
 
@@ -92,6 +111,8 @@ final class User: Validatable, Reflectable, Codable {
         try validations.add(\.email, .email || .nil) // test other way
         // validate that the lucky number is nil or is 5 or 7
         try validations.add(\.luckyNumber, .nil || .in(5, 7))
+        // validate that the phone number format is of the specified format
+        try validations.add(\.phone, .phone(type: .prefix(.dashWithParenthesis)))
         print(validations)
         return validations
     }
