@@ -36,10 +36,14 @@ private extension PhoneFormat {
 }
 
 public enum PhoneType {
-    /// Uses country code and always adds an empty space after. Example: `1 (239)555-7777`.
+
+    public typealias CustomRegex = () -> String
+    /// Uses country code and always adds an empty space after. Example: `1 (239)555-7777`. Follows USA/Canada standards.
     case useCountryCode(PhoneFormat)
     /// `PhoneFormat`
     case useSimple(PhoneFormat)
+    /// Use a custom regex for phone numbers that don't follow USA/Canada standards. (i.e. Australia, China, etc...)
+    case useCustomRegex(CustomRegex)
 
     var regex: String {
         switch self {
@@ -47,6 +51,8 @@ public enum PhoneType {
             return "\(countryCodeRegex) \(format.regex)"
         case .useSimple(let format):
             return format.regex
+        case .useCustomRegex(let customRegex):
+            return customRegex()
         }
     }
 }

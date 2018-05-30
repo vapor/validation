@@ -54,12 +54,19 @@ class ValidationTests: XCTestCase {
     }
 
     func testPhone() throws {
+
+        let genericInternationalRegex = """
+        ((?:\\+|00)[17](?: |\\-)?|(?:\\+|00)[1-9]\\d{0,2}(?: |\\-)?|(?:\\+|00)1\\-\\d{3}(?: |\\-)?)?(0\\d|\\([0-9]{3}\\)|[1-9]{0,3})(?:((?: |\\-)[0-9]{2}){4}|((?:[0-9]{2}){4})|((?: |\\-)[0-9]{3}(?: |\\-)[0-9]{4})|([0-9]{7}))
+        """
+
         try Validator<String>.phone(type: .useSimple(.plain)).validate("2399997777")
         try Validator<String>.phone(type: .useSimple(.dashOnly)).validate("239-999-7777")
         try Validator<String>.phone(type: .useSimple(.dashWithParenthesis)).validate("(239)999-7777")
         try Validator<String>.phone(type: .useCountryCode(.plain)).validate("1 2399997777")
         try Validator<String>.phone(type: .useCountryCode(.dashOnly)).validate("72 239-999-7777")
         try Validator<String>.phone(type: .useCountryCode(.dashWithParenthesis)).validate("99 (239)999-7777")
+        try Validator<String>.phone(type: .useCustomRegex({ "[0-9]{3}[0-9]{3}[0-9]{4}$" })).validate("2399997777")
+        try Validator<String>.phone(type: .useCustomRegex({ genericInternationalRegex })).validate("+7 06 79 91 25 49")
 
         XCTAssertThrowsError(try Validator<String>.phone(type: .useSimple(.plain)).validate("23999977777"))
         XCTAssertThrowsError(try Validator<String>.phone(type: .useSimple(.dashOnly)).validate("1(239)999-7777"))
@@ -67,6 +74,7 @@ class ValidationTests: XCTestCase {
         XCTAssertThrowsError(try Validator<String>.phone(type: .useCountryCode(.plain)).validate("1239-999-7777"))
         XCTAssertThrowsError(try Validator<String>.phone(type: .useCountryCode(.dashOnly)).validate("72(239)999-7777"))
         XCTAssertThrowsError(try Validator<String>.phone(type: .useCountryCode(.dashWithParenthesis)).validate("99-239-999-777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useCustomRegex({ "" })).validate("72(239)999-7777"))
     }
     
     static var allTests = [
