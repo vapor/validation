@@ -4,7 +4,7 @@ import XCTest
 
 class ValidationTests: XCTestCase {
     func testValidate() throws {
-        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
+        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4), preferedColors: ["blue?", "green?"])
         user.luckyNumber = 7
         user.email = "tanner@vapor.codes"
         try user.validate()
@@ -22,6 +22,13 @@ class ValidationTests: XCTestCase {
     func testAlphanumeric() throws {
         try Validator<String>.alphanumeric.validate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
         XCTAssertThrowsError(try Validator<String>.alphanumeric.validate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))
+    }
+    
+    func testEmpty() throws {
+        try Validator<String>.empty.validate("")
+        XCTAssertThrowsError(try Validator<String>.empty.validate("something"))
+        try Validator<[Int]>.empty.validate([])
+        XCTAssertThrowsError(try Validator<[Int]>.empty.validate([1, 2]))
     }
 
     func testEmail() throws {
@@ -57,6 +64,7 @@ class ValidationTests: XCTestCase {
         ("testValidate", testValidate),
         ("testASCII", testASCII),
         ("testAlphanumeric", testAlphanumeric),
+        ("testEmpty", testEmpty),
         ("testEmail", testEmail),
         ("testRange", testRange),
     ]
@@ -69,12 +77,14 @@ final class User: Validatable, Reflectable, Codable {
     var email: String?
     var pet: Pet
     var luckyNumber: Int?
+    var preferedColors: [String]
 
-    init(id: Int? = nil, name: String, age: Int, pet: Pet) {
+    init(id: Int? = nil, name: String, age: Int, pet: Pet, preferedColors: [String]) {
         self.id = id
         self.name = name
         self.age = age
         self.pet = pet
+        self.preferedColors = preferedColors
     }
 
 
@@ -92,6 +102,7 @@ final class User: Validatable, Reflectable, Codable {
         try validations.add(\.email, .email || .nil) // test other way
         // validate that the lucky number is nil or is 5 or 7
         try validations.add(\.luckyNumber, .nil || .in(5, 7))
+        try validations.add(\.preferedColors, !.empty)
         print(validations)
         return validations
     }
