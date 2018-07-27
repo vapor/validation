@@ -1,4 +1,9 @@
 
+/// Describes the validation of the area code and the digits after the area code.
+/// Supports the following types:
+/// - **plain**: Only uses numbers. Example: `2397777777`
+/// - **dashWithParenthesis**: Uses Dash and Parenthesis. Example: `(239)777-7777`
+/// - **dashOnly**: Only uses Dashes. Example: `239-777-7777`
 public enum PhoneFormat {
     /// Only uses numbers. Example: `2397777777`
     case plain
@@ -35,6 +40,12 @@ private extension PhoneFormat {
     }
 }
 
+/// Describes the phone type to validate against.
+/// This doesn't take into consideration the area code or the digits after the area code (**1** (xxx)xxx-xxxx). The validation for these is set by `PhoneFormat`.
+/// Supports the following types:
+/// - **useCountryCode**: Will validate that the phone number have the country code `1 (xxx)xxx-xxxx`
+/// - **useSimple**: Only validates the area code and phone number.
+/// - **useCustomRegex**: Will validate against a custom regex passed in as a parameter. This option should be use when validating phone numbers that don't follow USA/Canada standards. (i.e. Australia, China, etc...)
 public enum PhoneType {
 
     public typealias CustomRegex = () -> String
