@@ -4,7 +4,7 @@ import XCTest
 
 class ValidationTests: XCTestCase {
     func testValidate() throws {
-        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4))
+        let user = User(name: "Tanner", age: 23, pet: Pet(name: "Zizek Pulaski", age: 4), phone:"1 (239)999-7575")
         user.luckyNumber = 7
         user.email = "tanner@vapor.codes"
         try user.validate()
@@ -52,6 +52,30 @@ class ValidationTests: XCTestCase {
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(-6))
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(6))
     }
+
+    func testPhone() throws {
+
+        let genericInternationalRegex = """
+        ((?:\\+|00)[17](?: |\\-)?|(?:\\+|00)[1-9]\\d{0,2}(?: |\\-)?|(?:\\+|00)1\\-\\d{3}(?: |\\-)?)?(0\\d|\\([0-9]{3}\\)|[1-9]{0,3})(?:((?: |\\-)[0-9]{2}){4}|((?:[0-9]{2}){4})|((?: |\\-)[0-9]{3}(?: |\\-)[0-9]{4})|([0-9]{7}))
+        """
+
+        try Validator<String>.phone(type: .useSimple(.plain)).validate("2399997777")
+        try Validator<String>.phone(type: .useSimple(.dashOnly)).validate("239-999-7777")
+        try Validator<String>.phone(type: .useSimple(.dashWithParenthesis)).validate("(239)999-7777")
+        try Validator<String>.phone(type: .useCountryCode(.plain)).validate("1 2399997777")
+        try Validator<String>.phone(type: .useCountryCode(.dashOnly)).validate("72 239-999-7777")
+        try Validator<String>.phone(type: .useCountryCode(.dashWithParenthesis)).validate("99 (239)999-7777")
+        try Validator<String>.phone(type: .useCustomRegex({ "[0-9]{3}[0-9]{3}[0-9]{4}$" })).validate("2399997777")
+        try Validator<String>.phone(type: .useCustomRegex({ genericInternationalRegex })).validate("+7 06 79 91 25 49")
+
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useSimple(.plain)).validate("23999977777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useSimple(.dashOnly)).validate("1(239)999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useSimple(.dashWithParenthesis)).validate("239-999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useCountryCode(.plain)).validate("1239-999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useCountryCode(.dashOnly)).validate("72(239)999-7777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useCountryCode(.dashWithParenthesis)).validate("99-239-999-777"))
+        XCTAssertThrowsError(try Validator<String>.phone(type: .useCustomRegex({ "" })).validate("72(239)999-7777"))
+    }
     
     static var allTests = [
         ("testValidate", testValidate),
@@ -59,6 +83,7 @@ class ValidationTests: XCTestCase {
         ("testAlphanumeric", testAlphanumeric),
         ("testEmail", testEmail),
         ("testRange", testRange),
+        ("testPhone", testPhone)
     ]
 }
 
@@ -69,12 +94,14 @@ final class User: Validatable, Reflectable, Codable {
     var email: String?
     var pet: Pet
     var luckyNumber: Int?
+    var phone: String
 
-    init(id: Int? = nil, name: String, age: Int, pet: Pet) {
+    init(id: Int? = nil, name: String, age: Int, pet: Pet, phone: String) {
         self.id = id
         self.name = name
         self.age = age
         self.pet = pet
+        self.phone = phone
     }
 
 
@@ -92,6 +119,8 @@ final class User: Validatable, Reflectable, Codable {
         try validations.add(\.email, .email || .nil) // test other way
         // validate that the lucky number is nil or is 5 or 7
         try validations.add(\.luckyNumber, .nil || .in(5, 7))
+        // validate that the phone number format is of the specified format
+        try validations.add(\.phone, .phone(type: .useCountryCode(.dashWithParenthesis)))
         print(validations)
         return validations
     }
