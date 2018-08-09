@@ -10,7 +10,7 @@ class ValidationTests: XCTestCase {
         try user.validate()
         try user.pet.validate()
 
-        let secondUser = User(name: "Natan", age: 30, pet: Pet(name: "Nina", age: 4))
+        let secondUser = User(name: "Natan", age: 30, pet: Pet(name: "Nina", age: 4), preferedColors: ["pink"])
         secondUser.profilePictureURL = "https://www.somedomain.com/somePath.png"
         secondUser.email = "natan@vapor.codes"
         try secondUser.validate()
