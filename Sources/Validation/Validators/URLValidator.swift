@@ -26,7 +26,7 @@ fileprivate struct URLValidator: ValidatorType {
         return "a valid URL"
     }
 
-    /// Creates a new `EmailValidator`.
+    /// Creates a new `URLValidator`.
     public init() {}
 
     /// See `Validator`.
