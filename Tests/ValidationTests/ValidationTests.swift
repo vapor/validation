@@ -94,7 +94,7 @@ final class User: Validatable, Reflectable, Codable {
     var profilePictureURL: String?
     var preferedColors: [String]
 
-    init(id: Int? = nil, name: String, age: Int, pet: Pet, preferedColors: [String]) {
+    init(id: Int? = nil, name: String, age: Int, pet: Pet, preferedColors: [String] = []) {
         self.id = id
         self.name = name
         self.age = age
