@@ -9,6 +9,11 @@ class ValidationTests: XCTestCase {
         user.email = "tanner@vapor.codes"
         try user.validate()
         try user.pet.validate()
+
+        let secondUser = User(name: "Natan", age: 30, pet: Pet(name: "Nina", age: 4))
+        secondUser.profilePictureURL = "https://www.somedomain.com/somePath.png"
+        secondUser.email = "natan@vapor.codes"
+        try secondUser.validate()
     }
 
     func testASCII() throws {
@@ -59,6 +64,14 @@ class ValidationTests: XCTestCase {
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(-6))
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(6))
     }
+
+    func testURL() throws {
+        try Validator<String>.url.validate("https://www.somedomain.com/somepath.png")
+        try Validator<String>.url.validate("https://www.somedomain.com/")
+        try Validator<String>.url.validate("file:///Users/vapor/rocks/somePath.png")
+        XCTAssertThrowsError(try Validator<String>.url.validate("www.somedomain.com/"))
+        XCTAssertThrowsError(try Validator<String>.url.validate("bananas"))
+    }
     
     static var allTests = [
         ("testValidate", testValidate),
@@ -67,6 +80,7 @@ class ValidationTests: XCTestCase {
         ("testEmpty", testEmpty),
         ("testEmail", testEmail),
         ("testRange", testRange),
+        ("testURL", testURL),
     ]
 }
 
@@ -77,16 +91,16 @@ final class User: Validatable, Reflectable, Codable {
     var email: String?
     var pet: Pet
     var luckyNumber: Int?
+    var profilePictureURL: String?
     var preferedColors: [String]
 
-    init(id: Int? = nil, name: String, age: Int, pet: Pet, preferedColors: [String]) {
+    init(id: Int? = nil, name: String, age: Int, pet: Pet, preferedColors: [String] = []) {
         self.id = id
         self.name = name
         self.age = age
         self.pet = pet
         self.preferedColors = preferedColors
     }
-
 
     static func validations() throws -> Validations<User> {
         var validations = Validations(User.self)
@@ -102,6 +116,8 @@ final class User: Validatable, Reflectable, Codable {
         try validations.add(\.email, .email || .nil) // test other way
         // validate that the lucky number is nil or is 5 or 7
         try validations.add(\.luckyNumber, .nil || .in(5, 7))
+        // validate that the profile picture is nil or a valid URL
+        try validations.add(\.profilePictureURL, .url || .nil)
         try validations.add(\.preferedColors, !.empty)
         print(validations)
         return validations
