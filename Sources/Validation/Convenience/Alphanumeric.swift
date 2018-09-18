@@ -1,5 +1,9 @@
 private let alphanumeric = "abcdefghijklmnopqrstuvwxyz0123456789"
+#if swift(>=4)
+private let validCharacters = alphanumeric
+#else
 private let validCharacters = alphanumeric.characters
+#endif
 
 /// A validator that can be used to check that a
 /// given string contains only alphanumeric characters
@@ -13,10 +17,17 @@ public struct OnlyAlphanumeric: Validator {
 
         - throws: an error if validation fails
     */
+
+
     public func validate(_ input: String) throws {
-        let passed = !input
-            .lowercased()
-            .characters
+
+    #if swift(>=4)
+        let characters = input.lowercased()
+    #else
+        let characters = input.lowercased().characters
+    #endif
+
+        let passed = !characters
             .contains { !validCharacters.contains($0) }
 
         if !passed {

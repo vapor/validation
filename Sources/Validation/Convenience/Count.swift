@@ -1,7 +1,7 @@
 /// Indicates that a particular type can be validated by count or length
 public protocol Countable: Validatable {
     // The type that will be used to evaluate the count
-    associatedtype CountType: Comparable, Equatable
+    associatedtype CountType: Comparable
 
     // The count of the object
     var count: CountType { get }
@@ -85,9 +85,12 @@ extension Float: Countable {}
 extension Double: Countable {}
 
 extension String: Countable {
+    #if swift(>=4)
+    #else
     public var count: Int {
         return characters.count
     }
+    #endif
 }
 
 #if swift(>=4)
