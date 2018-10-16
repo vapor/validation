@@ -38,19 +38,12 @@ extension Validator where T: Collection {
 fileprivate struct CountValidator<T>: ValidatorType where T: Collection {
     /// See `ValidatorType`.
     var validatorReadable: String {
-        let x: String
-        if T.self is String.Type {
-            x = "characters"
-        } else {
-            x = "items"
-        }
-
         if let min = self.min, let max = self.max {
-            return "between \(min) and \(max) \(x)"
+            return "between \(min) and \(elementDescription(count: max))"
         } else if let min = self.min {
-            return "at least \(min) \(x)"
+            return "at least \(elementDescription(count: min))"
         } else if let max = self.max {
-            return "at most \(max) \(x)"
+            return "at most \(elementDescription(count: max))"
         } else {
             return "valid"
         }
@@ -75,14 +68,22 @@ fileprivate struct CountValidator<T>: ValidatorType where T: Collection {
     func validate(_ data: T) throws {
         if let min = self.min {
             guard data.count >= min else {
-                throw BasicValidationError("is not larger than \(min)")
+                throw BasicValidationError("is shorter than \(elementDescription(count: min))")
             }
         }
 
         if let max = self.max {
             guard data.count <= max else {
-                throw BasicValidationError("is larger than \(max)")
+                throw BasicValidationError("is longer than \(elementDescription(count: max))")
             }
+        }
+    }
+
+    private func elementDescription(count: Int) -> String {
+        if T.Element.self is Character.Type {
+            return count == 1 ? "1 character" : "\(count) characters"
+        } else {
+            return count == 1 ? "1 item" : "\(count) items"
         }
     }
 }

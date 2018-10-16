@@ -50,19 +50,46 @@ class ValidationTests: XCTestCase {
         try Validator<Int>.range(-5...5).validate(4)
         try Validator<Int>.range(-5...5).validate(5)
         try Validator<Int>.range(-5...5).validate(-5)
-        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(6))
-        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(-6))
+        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(6)) { error in
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is greater than 5")
+        }
+        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(-6)) { error in
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is less than -5")
+        }
 
         try Validator<Int>.range(5...).validate(.max)
 
-        try Validator<Int>.range(-5...5).validate(4)
-        XCTAssertThrowsError(try Validator<Int>.range(-5...5).validate(6))
-        
         try Validator<Int>.range(-5..<6).validate(-5)
         try Validator<Int>.range(-5..<6).validate(-4)
         try Validator<Int>.range(-5..<6).validate(5)
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(-6))
         XCTAssertThrowsError(try Validator<Int>.range(-5..<6).validate(6))
+    }
+
+    func testCountCharacters() throws {
+        let validator = Validator<String>.count(1...6)
+        try validator.validate("1")
+        try validator.validate("123")
+        try validator.validate("123456")
+        XCTAssertThrowsError(try validator.validate("")) { error in
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is shorter than 1 character")
+        }
+        XCTAssertThrowsError(try validator.validate("1234567")) { error in
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is longer than 6 characters")
+        }
+    }
+
+    func testCountItems() throws {
+        let validator = Validator<[Int]>.count(1...6)
+        try validator.validate([1])
+        try validator.validate([1, 2, 3])
+        try validator.validate([1, 2, 3, 4, 5, 6])
+        XCTAssertThrowsError(try validator.validate([])) { error in
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is shorter than 1 item")
+        }
+        XCTAssertThrowsError(try validator.validate([1, 2, 3, 4, 5, 6, 7])) { error in
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is longer than 6 items")
+        }
     }
 
     func testURL() throws {
@@ -80,6 +107,8 @@ class ValidationTests: XCTestCase {
         ("testEmpty", testEmpty),
         ("testEmail", testEmail),
         ("testRange", testRange),
+        ("testCountCharacters", testCountCharacters),
+        ("testCountItems", testCountItems),
         ("testURL", testURL),
     ]
 }
