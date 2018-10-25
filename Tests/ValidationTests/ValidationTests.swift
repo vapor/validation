@@ -72,10 +72,10 @@ class ValidationTests: XCTestCase {
         try validator.validate("123")
         try validator.validate("123456")
         XCTAssertThrowsError(try validator.validate("")) { error in
-            XCTAssertEqual((error as? ValidationError)?.reason, "data is shorter than 1 character")
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is less than required minimum of 1 character")
         }
         XCTAssertThrowsError(try validator.validate("1234567")) { error in
-            XCTAssertEqual((error as? ValidationError)?.reason, "data is longer than 6 characters")
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is greater than required maximum of 6 characters")
         }
     }
 
@@ -85,10 +85,10 @@ class ValidationTests: XCTestCase {
         try validator.validate([1, 2, 3])
         try validator.validate([1, 2, 3, 4, 5, 6])
         XCTAssertThrowsError(try validator.validate([])) { error in
-            XCTAssertEqual((error as? ValidationError)?.reason, "data is shorter than 1 item")
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is less than required minimum of 1 item")
         }
         XCTAssertThrowsError(try validator.validate([1, 2, 3, 4, 5, 6, 7])) { error in
-            XCTAssertEqual((error as? ValidationError)?.reason, "data is longer than 6 items")
+            XCTAssertEqual((error as? ValidationError)?.reason, "data is greater than required maximum of 6 items")
         }
     }
 

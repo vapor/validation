@@ -68,13 +68,13 @@ fileprivate struct CountValidator<T>: ValidatorType where T: Collection {
     func validate(_ data: T) throws {
         if let min = self.min {
             guard data.count >= min else {
-                throw BasicValidationError("is shorter than \(elementDescription(count: min))")
+                throw BasicValidationError("is less than required minimum of \(elementDescription(count: min))")
             }
         }
 
         if let max = self.max {
             guard data.count <= max else {
-                throw BasicValidationError("is longer than \(elementDescription(count: max))")
+                throw BasicValidationError("is greater than required maximum of \(elementDescription(count: max))")
             }
         }
     }
