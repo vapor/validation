@@ -21,8 +21,9 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
     ///     - keyPath: `KeyPath` to validatable property.
     ///     - path: Readable path. Will be displayed when showing errors.
     ///     - validation: `Validation` to run on this property.
-    public mutating func add<T>(_ keyPath: KeyPath<M, T>, at path: [String], _ validator: Validator<T>) {
-        add(keyPath, at: path, "is " + validator.readable, { value in
+    ///     - customMessage: Custom error message.
+    public mutating func add<T>(_ keyPath: KeyPath<M, T>, at path: [String], _ validator: Validator<T>, customMessage: String? = nil) {
+        add(keyPath, at: path, "is " + validator.readable, customMessage: customMessage, { value in
             try validator.validate(value)
         })
     }
@@ -37,13 +38,15 @@ public struct Validations<M>: CustomStringConvertible where M: Validatable {
     ///     - keyPath: `KeyPath` to validatable property.
     ///     - path: Readable path. Will be displayed when showing errors.
     ///     - readable: Readable string describing this validation.
+    ///     - customMessage: Custom error message.
     ///     - custom: Closure accepting the `KeyPath`'s value. Throw a `ValidationError` here if the data is invalid.
-    public mutating func add<T>(_ keyPath: KeyPath<M, T>, at path: [String], _ readable: String, _ custom: @escaping (T) throws -> Void) {
+    public mutating func add<T>(_ keyPath: KeyPath<M, T>, at path: [String], _ readable: String, customMessage: String? = nil, _ custom: @escaping (T) throws -> Void) {
         add("\(path.joined(separator: ".")): \(readable)") { model in
             do {
                 try custom(model[keyPath: keyPath])
             } catch var error as ValidationError {
                 error.path += path
+                error.customMessage = customMessage
                 throw error
             }
         }
@@ -91,8 +94,9 @@ extension Validations where M: Reflectable {
     /// - parameters:
     ///     - keyPath: `KeyPath` to validatable property.
     ///     - validation: `Validation` to run on this property.
-    public mutating func add<T>(_ keyPath: KeyPath<M, T>, _ validator: Validator<T>) throws {
-        try add(keyPath, at: M.reflectProperty(forKey: keyPath)?.path ?? [], validator)
+    ///     - customMessage: Custom error message.
+    public mutating func add<T>(_ keyPath: KeyPath<M, T>, _ validator: Validator<T>, customMessage: String? = nil) throws {
+        try add(keyPath, at: M.reflectProperty(forKey: keyPath)?.path ?? [], validator, customMessage: customMessage)
     }
 
 
@@ -105,24 +109,28 @@ extension Validations where M: Reflectable {
     /// - parameters:
     ///     - keyPath: `KeyPath` to validatable property.
     ///     - readable: Readable string describing this validation.
+    ///     - customMessage: Custom error message.
     ///     - custom: Closure accepting the `KeyPath`'s value. Throw a `ValidationError` here if the data is invalid.
-    public mutating func add<T>(_ keyPath: KeyPath<M, T>, _ readable: String, _ custom: @escaping (T) throws -> Void) throws {
-        try add(keyPath, at: M.reflectProperty(forKey: keyPath)?.path ?? [], readable, custom)
+    public mutating func add<T>(_ keyPath: KeyPath<M, T>, _ readable: String, customMessage: String? = nil, _ custom: @escaping (T) throws -> Void) throws {
+        try add(keyPath, at: M.reflectProperty(forKey: keyPath)?.path ?? [], readable, customMessage: customMessage, custom)
     }
 }
 
 // MARK: Private
 
 /// A collection of errors thrown by validatable models validations
-fileprivate struct ValidateErrors: ValidationError {
+public struct ValidateErrors: ValidationError {
     /// the errors thrown
-    var errors: [ValidationError]
+    public var errors: [ValidationError]
 
     /// See ValidationError.keyPath
-    var path: [String]
+    public var path: [String]
+    
+    /// See ValidationError.customMessage
+    public var customMessage: String?
 
     /// See ValidationError.reason
-    var reason: String {
+    public var reason: String {
         return errors.map { error in
             var mutableError = error
             mutableError.path = path + error.path

@@ -7,6 +7,7 @@ import Debugging
 public protocol ValidationError: Debuggable {
     /// Key path to the invalid data.
     var path: [String] { get set }
+    var customMessage: String? { get set }
 }
 
 extension ValidationError {
@@ -22,13 +23,17 @@ extension ValidationError {
 public struct BasicValidationError: ValidationError {
     /// See `Debuggable`
     public var reason: String {
-        let path: String
-        if self.path.count > 0 {
-            path = "'" + self.path.joined(separator: ".") + "'"
+        if let customMessage = customMessage {
+            return customMessage
         } else {
-            path = "data"
+            let path: String
+            if self.path.count > 0 {
+                path = "'" + self.path.joined(separator: ".") + "'"
+            } else {
+                path = "data"
+            }
+            return "\(path) \(message)"
         }
-        return "\(path) \(message)"
     }
 
     /// The validation failure
@@ -36,6 +41,9 @@ public struct BasicValidationError: ValidationError {
 
     /// Key path the validation error happened at
     public var path: [String]
+    
+    /// See ValidationError.customMessage
+    public var customMessage: String?
 
     /// Create a new JWT error
     public init(_ message: String) {
