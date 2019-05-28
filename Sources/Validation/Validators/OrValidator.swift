@@ -61,6 +61,9 @@ public struct OrValidatorError: ValidationError {
 
     /// See ValidationError.keyPath
     public var path: [String]
+    
+    /// See ValidationError.customMessage
+    public var customMessage: String?
 
     /// Creates a new or validator error
     init(_ left: ValidationError, _ right: ValidationError) {
