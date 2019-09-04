@@ -3,11 +3,14 @@ import Foundation
 public struct EmailValidator: Validator {
 
     public init() {}
-	private let pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+	private let pattern = "[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,64}"
 
 
     public func validate(_ input: String) throws {
-    	guard input.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil else {
+    	guard
+            let range = input.range(of: pattern, options: [.regularExpression, .caseInsensitive]),
+            range.lowerBound == input.startIndex, range.upperBound == input.endIndex
+        else {
 			throw error("\(input) is not a valid email address")
 		}
     }
