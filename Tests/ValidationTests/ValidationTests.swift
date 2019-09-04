@@ -84,9 +84,11 @@ class ValidationTests: XCTestCase {
         XCTAssertTrue("f@b.co".passes(EmailValidator()))
         XCTAssertTrue("foo@bar.com".passes(EmailValidator()))
         XCTAssertTrue("SOMETHING@SOMETHING.SOMETHING".passes(EmailValidator()))
-        XCTAssertTrue("foo!-bar!-baz@foo.bar".passes(EmailValidator()))
+        XCTAssertTrue("foo-bar-baz@foo.bar".passes(EmailValidator()))
         XCTAssertFalse("f@b.".passes(EmailValidator()))
         XCTAssertFalse("æøå@gmail.com".passes(EmailValidator()))
+        XCTAssertFalse(">a@b.co".passes(EmailValidator()))
+        XCTAssertFalse("a@b.co<".passes(EmailValidator()))
     }
 
     func testValidHexadecimal() {
